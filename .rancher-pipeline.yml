@@ -1,0 +1,40 @@
+stages:
+- name: build
+  steps:
+  - runScriptConfig:
+      image: maven:3.6-jdk-8-alpine
+      shellScript: |-
+        pwd
+        ls -al
+        mvn install -Dmaven.test.skip=true
+  when:
+    event: {}
+- name: 部署
+  steps:
+  - publishImageConfig:
+      dockerfilePath: ./dockerfile
+      buildContext: .
+      tag: sbfx/myeureka:v1.${CICD_EXECUTION_SEQUENCE}
+      pushRemote: true
+      registry: 10.10.66.49:9081
+    env:
+      PLUGIN_DEBUG: "true"
+      PLUGIN_INSECURE: "true"
+- name: 部署应用
+  steps:
+  - applyYamlConfig:
+      path: ./deployment.yml
+    env:
+      CICD_GIT_TAG: v1.${CICD_EXECUTION_SEQUENCE}
+  - applyYamlConfig:
+      path: ./servicedep.yml
+timeout: 60
+branch:
+  include:
+  - master
+notification:
+  recipients:
+  - recipient: chenfg@yonyou.com
+    notifier: c-4dkhv:n-mzm72
+  condition:
+  - Changed
