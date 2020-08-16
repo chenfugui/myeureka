@@ -3,10 +3,7 @@ stages:
   steps:
   - runScriptConfig:
       image: maven:3.6-jdk-8-alpine
-      shellScript: |-
-        pwd
-        ls -al
-        mvn install -Dmaven.test.skip=true
+      shellScript: mvn install -Dmaven.test.skip=true
   when:
     event: {}
 - name: 部署
@@ -16,7 +13,7 @@ stages:
       buildContext: .
       tag: sbfx/myeureka:v1.${CICD_EXECUTION_SEQUENCE}
       pushRemote: true
-      registry: 10.10.66.49:9081
+      registry: 192.168.0.106:445
     env:
       PLUGIN_DEBUG: "true"
       PLUGIN_INSECURE: "true"
@@ -32,9 +29,4 @@ timeout: 60
 branch:
   include:
   - master
-notification:
-  recipients:
-  - recipient: chenfg@yonyou.com
-    notifier: c-4dkhv:n-mzm72
-  condition:
-  - Changed
+notification: {}
